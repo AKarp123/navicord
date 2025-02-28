@@ -123,7 +123,13 @@ class CurrentTrack:
             and json["status"] == "ok"
             and len(json["nowPlaying"]) > 0
         ):
-            nowPlaying = json["nowPlaying"]["entry"][0]
+            nowPlayingList = json["nowPlaying"]["entry"]
+
+            nowPlaying = [
+                entry
+                for entry in nowPlayingList
+                if entry["username"] == config.NAVIDRONE_USERNAME
+            ][0]
 
             cls.set(
                 id=nowPlaying["id"],
