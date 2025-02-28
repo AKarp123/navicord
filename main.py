@@ -97,7 +97,7 @@ class CurrentTrack:
         cls.artist = artist
         cls.album = album
         cls.started_at = time.time()
-        cls.ends_at = cls.started_at + duration
+        cls.ends_at = cls.started_at + (duration or 0)
 
     @classmethod
     def _grab_subsonic(cls):
