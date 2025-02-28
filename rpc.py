@@ -10,7 +10,9 @@ class DiscordRPC:
         self.app_id = app_id
         self.token = token
         self.ws = None
+        self._connect()
 
+    def _connect(self):
         discord_gateway_url = requests.get("https://discord.com/api/gateway").json()[
             "url"
         ]
@@ -103,5 +105,8 @@ class DiscordRPC:
         print(f"Error: {error}")
 
     def on_close(self, ws, close_status, close_msg):
-        print("WebSocket closed")
+        print("WebSocket closed, trying reconnect")
         print(close_msg)
+
+        time.sleep(10)
+        self._connect()  # retry per 10 seconds
