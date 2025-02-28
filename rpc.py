@@ -10,20 +10,49 @@ class DiscordRPC:
         self.app_id = app_id
         self.token = token
         self.ws = None
-        self._connect()
+
+        threading.Thread(target=self._connect).start()
 
     def _connect(self):
-        discord_gateway_url = requests.get("https://discord.com/api/gateway").json()[
-            "url"
-        ]
-        self.ws = websocket.WebSocketApp(
-            f"{discord_gateway_url}/?v=10&encoding=json",
-            on_error=self.on_error,
-            on_close=self.on_close,
-            on_open=self.on_open,
-        )
-        self.ws_thread = threading.Thread(target=self.ws.run_forever, daemon=True)
-        self.ws_thread.start()
+        while True:
+            time.sleep(5)
+
+            if self.ws:
+                continue
+
+            try:
+                discord_gateway_url = requests.get(
+                    "https://discord.com/api/gateway"
+                ).json()["url"]
+
+                websocket.enableTrace(False)
+                self.ws = websocket.WebSocketApp(
+                    discord_gateway_url,
+                    f"{discord_gateway_url}/?v=10&encoding=json",
+                    on_error=self.on_error,
+                    on_close=self.on_close,
+                    on_open=self.on_open,
+                    on_message=self.on_message,
+                )
+
+                threading.Thread(target=self.ws.run_forever).start()
+
+                last_pinged_since = 0
+                while True:
+                    if not self.ws:
+                        break
+
+                    if last_pinged_since > 10:
+                        last_pinged_since = 0
+
+                        payload = {"op": 1, "d": None}
+                        self.ws.send(json.dumps(payload))
+
+                    time.sleep(1)
+                    last_pinged_since += 1
+
+            except Exception as e:
+                print(f"Websocket connection Error: {e}")
 
     def _process_image(self, image_url):
         url = f"https://discord.com/api/v9/applications/{self.app_id}/external-assets"
@@ -35,13 +64,10 @@ class DiscordRPC:
         data = response.json()[0]
         return f"mp:{data['external_asset_path']}"
 
-    def _send_heartbeat(self):
-        while True:
-            time.sleep(5)
-            payload = {"op": 1, "d": None}
-            self.ws.send(json.dumps(payload))
-
     def send(self, activity_data):
+        if not self.ws:
+            return
+
         payload = {
             "op": 3,
             "d": {
@@ -71,6 +97,9 @@ class DiscordRPC:
         self.ws.send(json.dumps(payload))
 
     def clear(self):
+        if not self.ws:
+            return
+
         payload = {
             "op": 3,
             "d": {
@@ -83,7 +112,9 @@ class DiscordRPC:
         self.ws.send(json.dumps(payload))
 
     def on_open(self, ws):
-        ws.send(
+        print("Websocket to discord gateway opened")
+
+        self.ws.send(
             json.dumps(
                 {
                     "op": 2,
@@ -91,7 +122,7 @@ class DiscordRPC:
                         "token": self.token,
                         "intents": 0,
                         "properties": {
-                            "os": "python",
+                            "os": "Windows 10",
                             "browser": "Discord Client",
                             "device": "Discord Client",
                         },
@@ -99,14 +130,11 @@ class DiscordRPC:
                 }
             )
         )
-        threading.Thread(target=self._send_heartbeat, daemon=True).start()
 
     def on_error(self, ws, error):
         print(f"Error: {error}")
 
     def on_close(self, ws, close_status, close_msg):
-        print("WebSocket closed, trying reconnect")
+        self.ws = None
+        print("WebSocket closed")
         print(close_msg)
-
-        time.sleep(10)
-        self._connect()  # retry per 10 seconds
