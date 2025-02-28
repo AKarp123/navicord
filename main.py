@@ -119,17 +119,21 @@ class CurrentTrack:
             },
         )
 
-        json = res.json()["subsonic-response"]
+        if res.status_code != 200:
+            print("There was an error getting now playing: ", res.text)
+            return
+
+        try:
+            json = res.json()["subsonic-response"]
+        except:
+            print("There was an error parsing subsonic response: ", res.text)
+            return
 
         if len(json["nowPlaying"]) == 0:
             cls.set(skip_none_check=True)
             return
 
-        if (
-            res.status_code == 200
-            and json["status"] == "ok"
-            and len(json["nowPlaying"]) > 0
-        ):
+        if json["status"] == "ok" and len(json["nowPlaying"]) > 0:
             nowPlayingEntry = json["nowPlaying"]["entry"]
             nowPlayingList = cls._filter_nowplaying(nowPlayingEntry)
 
