@@ -69,6 +69,13 @@ class CurrentTrack:
 
     image_url = None
 
+    def _filter_nowplaying(entry):
+        return [
+            player
+            for player in entry
+            if player["username"] == config.NAVIDRONE_USERNAME
+        ]
+
     @classmethod
     def set(cls, skip_none_check=False, **kwargs):
         image_url = kwargs.get("image_url")
@@ -123,13 +130,14 @@ class CurrentTrack:
             and json["status"] == "ok"
             and len(json["nowPlaying"]) > 0
         ):
-            nowPlayingList = json["nowPlaying"]["entry"]
+            nowPlayingEntry = json["nowPlaying"]["entry"]
+            nowPlayingList = cls._filter_nowplaying(nowPlayingEntry)
 
-            nowPlaying = [
-                entry
-                for entry in nowPlayingList
-                if entry["username"] == config.NAVIDRONE_USERNAME
-            ][0]
+            if len(nowPlayingList) == 0:
+                cls.set(skip_none_check=True)
+                return
+
+            nowPlaying = nowPlayingList[0]
 
             cls.set(
                 id=nowPlaying["id"],
