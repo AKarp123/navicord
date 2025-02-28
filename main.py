@@ -42,7 +42,7 @@ class PersistentStore:
             with open(cls.filename) as file:
                 cls.data = json.load(file)
         except FileNotFoundError:
-            pass
+            cls.data = {}
 
         cls.has_loaded = True
 
@@ -71,17 +71,17 @@ class CurrentTrack:
     @classmethod
     def set(cls, **kwargs):
         image_url = kwargs.get("image_url")
-
-        if image_url is not None:
+        if image_url:
             cls.image_url = image_url
 
-        try:
-            id, duration, artist, album, title, album_id = kwargs.values()
+        id = kwargs.get("id")
+        duration = kwargs.get("duration")
+        artist = kwargs.get("artist")
+        album = kwargs.get("album")
+        title = kwargs.get("title")
+        album_id = kwargs.get("album_id")
 
-            assert not any(
-                [i is None for i in [id, duration, artist, album, title, album_id]]
-            )
-        except (ValueError, AssertionError):
+        if None in [id, duration, artist, album, title, album_id]:
             return
 
         if id == cls.id:
@@ -128,8 +128,8 @@ class CurrentTrack:
 
     @classmethod
     def _grab_lastfm(cls):
-        if PersistentStore.has(cls.id):
-            return PersistentStore.get(cls.id)
+        if PersistentStore.has(cls.album_id):
+            return PersistentStore.get(cls.album_id)
 
         res = requests.get(
             "https://ws.audioscrobbler.com/2.0/",
@@ -149,7 +149,7 @@ class CurrentTrack:
                 image_url=image_url,
             )
 
-            PersistentStore.set(cls.id, image_url)
+            PersistentStore.set(cls.album_id, image_url)
 
     @classmethod
     def grab(cls):
