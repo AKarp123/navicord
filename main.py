@@ -70,7 +70,7 @@ class CurrentTrack:
     image_url = None
 
     @classmethod
-    def set(cls, **kwargs):
+    def set(cls, skip_none_check=False, **kwargs):
         image_url = kwargs.get("image_url")
         if image_url:
             cls.image_url = image_url
@@ -82,7 +82,10 @@ class CurrentTrack:
         title = kwargs.get("title")
         album_id = kwargs.get("album_id")
 
-        if None in [id, duration, artist, album, title, album_id]:
+        if (
+            None in [id, duration, artist, album, title, album_id]
+            and not skip_none_check
+        ):
             return
 
         if id == cls.id:
@@ -110,6 +113,10 @@ class CurrentTrack:
         )
 
         json = res.json()["subsonic-response"]
+
+        if len(json["nowPlaying"]) == 0:
+            cls.set(skip_none_check=True)
+            return
 
         if (
             res.status_code == 200
@@ -170,6 +177,7 @@ while True:
     CurrentTrack.grab()
 
     if CurrentTrack.id is None:
+        rpc.clear()
         continue
 
     if time_passed >= 5:

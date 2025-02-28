@@ -68,6 +68,18 @@ class DiscordRPC:
         }
         self.ws.send(json.dumps(payload))
 
+    def clear(self):
+        payload = {
+            "op": 3,
+            "d": {
+                "since": None,
+                "activities": [None],
+                "status": None,
+                "afk": None,
+            },
+        }
+        self.ws.send(json.dumps(payload))
+
     def on_open(self, ws):
         ws.send(
             json.dumps(
