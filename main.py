@@ -17,7 +17,7 @@ class PersistentStore:
     def get(cls, key):
         if not cls.has_loaded:
             cls.load()
-
+        print(cls.data.get(key))
         return cls.data.get(key)
 
     @classmethod
@@ -129,7 +129,7 @@ class CurrentTrack:
     @classmethod
     def _grab_lastfm(cls):
         if PersistentStore.has(cls.album_id):
-            return PersistentStore.get(cls.album_id)
+            cls.set(image_url=PersistentStore.get(cls.album_id))
 
         res = requests.get(
             "https://ws.audioscrobbler.com/2.0/",
@@ -156,6 +156,7 @@ class CurrentTrack:
         cls._grab_subsonic()
 
         if cls.artist and cls.album:
+            print("grabbing lastfm")
             cls._grab_lastfm()
 
 
