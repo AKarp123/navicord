@@ -176,12 +176,12 @@ while True:
 
     CurrentTrack.grab()
 
-    if CurrentTrack.id is None:
-        rpc.clear()
-        continue
-
     if time_passed >= 5:
         time_passed = 0
+
+        if CurrentTrack.id is None:
+            rpc.clear()
+            continue
 
         rpc.send(
             {
