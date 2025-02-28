@@ -57,6 +57,7 @@ class PersistentStore:
 
 class CurrentTrack:
     id = None
+    album_id = None
 
     title = None
     artist = None
@@ -75,9 +76,11 @@ class CurrentTrack:
             cls.image_url = image_url
 
         try:
-            id, duration, artist, album, title = kwargs.values()
+            id, duration, artist, album, title, album_id = kwargs.values()
 
-            assert not any([i is None for i in [id, duration, artist, album, title]])
+            assert not any(
+                [i is None for i in [id, duration, artist, album, title, album_id]]
+            )
         except (ValueError, AssertionError):
             return
 
@@ -85,6 +88,7 @@ class CurrentTrack:
             return
 
         cls.id = id
+        cls.album_id = album_id
         cls.title = title
         cls.artist = artist
         cls.album = album
@@ -119,12 +123,12 @@ class CurrentTrack:
                 artist=nowPlaying["artist"],
                 album=nowPlaying["album"],
                 title=nowPlaying["title"],
+                album_id=nowPlaying["albumId"],
             )
 
     @classmethod
     def _grab_lastfm(cls):
         if PersistentStore.has(cls.id):
-            print("exists")
             return PersistentStore.get(cls.id)
 
         res = requests.get(
@@ -144,6 +148,7 @@ class CurrentTrack:
             cls.set(
                 image_url=image_url,
             )
+
             PersistentStore.set(cls.id, image_url)
 
     @classmethod
@@ -156,7 +161,7 @@ class CurrentTrack:
 
 rpc = RPC(app_id=config.DISCORD_CLIENT_ID)
 
-time_passed = 0
+time_passed = 5
 
 while True:
     time.sleep(1)
@@ -166,11 +171,16 @@ while True:
     if CurrentTrack.id is None:
         continue
 
-    rpc.set_activity(
-        act_type=2,  # https://discord.com/developers/docs/change-log#supported-activity-types-for-setactivity
-        ts_start=CurrentTrack.started_at * 1000,
-        ts_end=CurrentTrack.ends_at * 1000,
-        details=CurrentTrack.title,
-        state=CurrentTrack.artist,
-        large_image=CurrentTrack.image_url,
-    )
+    if time_passed >= 5:
+        time_passed = 0
+
+        rpc.set_activity(
+            act_type=2,  # https://discord.com/developers/docs/change-log#supported-activity-types-for-setactivity
+            ts_start=CurrentTrack.started_at * 1000,
+            ts_end=CurrentTrack.ends_at * 1000,
+            details=CurrentTrack.title,
+            state=CurrentTrack.artist,
+            large_image=CurrentTrack.image_url,
+        )
+
+    time_passed += 1
