@@ -1,10 +1,11 @@
-from discordrpc import RPC
 import config
 import requests
 import time
 import threading
 import json
 import os
+
+from rpc import DiscordRPC
 
 
 class PersistentStore:
@@ -159,7 +160,7 @@ class CurrentTrack:
             cls._grab_lastfm()
 
 
-rpc = RPC(app_id=config.DISCORD_CLIENT_ID)
+rpc = DiscordRPC(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN)
 
 time_passed = 5
 
@@ -174,13 +175,17 @@ while True:
     if time_passed >= 5:
         time_passed = 0
 
-        rpc.set_activity(
-            act_type=2,  # https://discord.com/developers/docs/change-log#supported-activity-types-for-setactivity
-            ts_start=CurrentTrack.started_at * 1000,
-            ts_end=CurrentTrack.ends_at * 1000,
-            details=CurrentTrack.title,
-            state=CurrentTrack.artist,
-            large_image=CurrentTrack.image_url,
+        rpc.send(
+            {
+                "timestamps": {
+                    "start": CurrentTrack.started_at,
+                    "end": CurrentTrack.ends_at,
+                },
+                "name": "music",
+                "details": CurrentTrack.title,
+                "state": CurrentTrack.artist,
+                "image_url": CurrentTrack.image_url,
+            }
         )
 
     time_passed += 1
