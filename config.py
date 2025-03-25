@@ -3,7 +3,11 @@ from os import getenv
 
 load_dotenv()
 
-DISCORD_CLIENT_ID = 805831541070495744
+ACTIVITY_NAME = (
+    getenv("ACTIVITY_NAME") or "ARTIST"
+)  # ARTIST | ALBUM | TRACK | (anything else for normal text)
+
+DISCORD_CLIENT_ID = getenv("DISCORD_CLIENT_ID")
 DISCORD_TOKEN = getenv("DISCORD_TOKEN")
 LASTFM_API_KEY = getenv("LASTFM_API_KEY")
 

@@ -79,8 +79,7 @@ class CurrentTrack:
     @classmethod
     def set(cls, skip_none_check=False, **kwargs):
         image_url = kwargs.get("image_url")
-        if image_url:
-            cls.image_url = image_url
+        cls.image_url = image_url
 
         id = kwargs.get("id")
         duration = kwargs.get("duration")
@@ -156,6 +155,7 @@ class CurrentTrack:
     def _grab_lastfm(cls):
         if PersistentStore.has(cls.album_id):
             cls.set(image_url=PersistentStore.get(cls.album_id))
+            return
 
         res = requests.get(
             "https://ws.audioscrobbler.com/2.0/",
@@ -170,6 +170,10 @@ class CurrentTrack:
 
         if res.status_code == 200:
             image_url = res.json()["album"]["image"][3]["#text"]
+
+            if image_url == "":
+                cls.set(image_url=None)
+                return
 
             cls.set(
                 image_url=image_url,
@@ -201,16 +205,30 @@ while True:
             rpc.clear()
             continue
 
-        rpc.send(
+        match config.ACTIVITY_NAME:
+            case "ARTIST":
+                activity_name = CurrentTrack.artist
+            case "ALBUM":
+                activity_name = CurrentTrack.album
+            case "TRACK":
+                activity_name = CurrentTrack.title
+            case _:
+                activity_name = config.ACTIVITY_NAME
+
+        rpc.send_activity(
             {
-                "timestamps": {
-                    "start": CurrentTrack.started_at,
-                    "end": CurrentTrack.ends_at,
-                },
-                "name": "music",
-                "details": CurrentTrack.title,
+                "application_id": config.DISCORD_CLIENT_ID,
+                "type": 2,
                 "state": CurrentTrack.artist,
-                "image_url": CurrentTrack.image_url,
+                "details": CurrentTrack.title,
+                "assets": {
+                    "large_image": CurrentTrack.image_url,
+                },
+                "timestamps": {
+                    "start": CurrentTrack.started_at * 1000,
+                    "end": CurrentTrack.ends_at * 1000,
+                },
+                "name": activity_name,
             }
         )
 
