@@ -2,7 +2,7 @@
 
 A _headless_ Discord Rich Presence client for [Navidrome](https://www.navidrome.org/), with automatic album art fetching and timestamps
 
-## Setup
+## Install & first setup
 
 1. Install dependencies: `pip -r requirements.txt`
 
@@ -16,6 +16,14 @@ NAVIDRONE_SERVER=<your_navidrone_server_url> # this should look like http(s)://m
 NAVIDRONE_USERNAME=<your_navidrone_username>
 NAVIDRONE_PASSWORD=<your_navidrone_password>
 ```
+
+## Other setup
+
+There are also a few other variables that can be set in the environment file:
+
+| Variable      | Description            | Possible Values                  |
+| ------------- | ---------------------- | -------------------------------- |
+| ACTIVITY_NAME | Sets the activity name | ARTIST, ALBUM, TRACK, any string |
 
 ### Contributing
 
