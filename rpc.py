@@ -98,9 +98,10 @@ class DiscordRPC:
         if not self.ws:
             return
 
-        activity_data["assets"]["large_image"] = self._process_image(
-            activity_data["assets"]["large_image"]
-        )
+        if "large_image" in activity_data["assets"]:
+            activity_data["assets"]["large_image"] = self._process_image(
+                activity_data["assets"]["large_image"]
+            )
 
         payload = {
             "op": 3,
