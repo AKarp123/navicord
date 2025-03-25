@@ -98,7 +98,10 @@ class DiscordRPC:
         if not self.ws:
             return
 
-        if "large_image" in activity_data["assets"]:
+        if (
+            "large_image" in activity_data["assets"]
+            and activity_data["assets"]["large_image"] is not None
+        ):
             activity_data["assets"]["large_image"] = self._process_image(
                 activity_data["assets"]["large_image"]
             )
