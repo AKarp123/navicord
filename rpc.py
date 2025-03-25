@@ -88,7 +88,10 @@ class DiscordRPC:
             headers={"Authorization": self.token, "Content-Type": "application/json"},
             json={"urls": [image_url]},
         )
-        data = response.json()
+        try:
+            data = response.json()
+        except:
+            return self._process_image("https://i.imgur.com/hb3XPzA.png")
 
         if not isinstance(data, list):
             return self._process_image("https://i.imgur.com/hb3XPzA.png")
