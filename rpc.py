@@ -76,6 +76,9 @@ class DiscordRPC:
         logging.info(f"WebSocket closed: {close_msg}")
 
     def _process_image(self, image_url):
+        if image_url is None:
+            return self._process_image("https://i.imgur.com/hb3XPzA.png")
+
         if image_url.startswith("mp:"):
             return image_url
 
@@ -98,13 +101,9 @@ class DiscordRPC:
         if not self.ws:
             return
 
-        if (
-            "large_image" in activity_data["assets"]
-            and activity_data["assets"]["large_image"] is not None
-        ):
-            activity_data["assets"]["large_image"] = self._process_image(
-                activity_data["assets"]["large_image"]
-            )
+        activity_data["assets"]["large_image"] = self._process_image(
+            activity_data["assets"]["large_image"]
+        )
 
         payload = {
             "op": 3,
