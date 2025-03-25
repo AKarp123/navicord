@@ -202,7 +202,7 @@ while True:
         time_passed = 0
 
         if CurrentTrack.id is None:
-            rpc.clear()
+            rpc.clear_activity()
             continue
 
         match config.ACTIVITY_NAME:
