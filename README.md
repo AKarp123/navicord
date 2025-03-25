@@ -28,4 +28,4 @@ There are also a few other variables that can be set in the environment file:
 ### Contributing
 
 If you find a bug or have a suggestion, please [open an issue](https://github.com/logixism/navicord).
-If you want to contribute, please [fork the repository](https://github.com/logixism/navicord/fork) and create a pull request. Thanks! <small>please work on the `rpc.py` file</small>
+If you want to contribute, please [fork the repository](https://github.com/logixism/navicord/fork) and create a pull request. Thanks!
