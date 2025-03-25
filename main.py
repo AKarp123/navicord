@@ -219,7 +219,7 @@ while True:
             {
                 "application_id": config.DISCORD_CLIENT_ID,
                 "type": 2,
-                "state": CurrentTrack.artist,
+                "state": CurrentTrack.album,
                 "details": CurrentTrack.title,
                 "assets": {
                     "large_image": CurrentTrack.image_url,
