@@ -73,7 +73,7 @@ class CurrentTrack:
         return [
             player
             for player in entry
-            if player["username"] == config.NAVIDRONE_USERNAME
+            if player["username"] == config.NAVIDROME_USERNAME
         ]
 
     @classmethod
@@ -108,10 +108,10 @@ class CurrentTrack:
     @classmethod
     def _grab_subsonic(cls):
         res = requests.get(
-            f"{config.NAVIDRONE_SERVER}/rest/getNowPlaying",
+            f"{config.NAVIDROME_SERVER}/rest/getNowPlaying",
             params={
-                "u": config.NAVIDRONE_USERNAME,
-                "p": config.NAVIDRONE_PASSWORD,
+                "u": config.NAVIDROME_USERNAME,
+                "p": config.NAVIDROME_PASSWORD,
                 "f": "json",
                 "v": "1.13.0",
                 "c": "navicord",
