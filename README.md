@@ -30,7 +30,7 @@ There are also a few other variables that can be set in the environment file:
 To run the server with docker, you can use the following command:
 
 ```bash
-docker run logixism/navicord
+docker run --env-file <path/to/env/file> logixism/navicord
 ```
 
 ### Using Python 🐍
