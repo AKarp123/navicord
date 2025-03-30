@@ -8,14 +8,14 @@ A _headless_ Discord Rich Presence client for [Navidrome](https://www.navidrome.
 
 Create an .env file with the following variables:
 
-| Variable           | Description                                                          | Example value                                        |
-| ------------------ | -------------------------------------------------------------------- | ---------------------------------------------------- |
-| DISCORD_CLIENT_ID  | Your Discord app ID, you can use the example ID, doesn't matter much | 805831541070495744                                   |
-| DISCORD_TOKEN      | Your Discord account token, used to connect to the Discord gateway   | Mzg5NjkzNzA5MzQ4MTQ2NzY4.DM9aRQ.Tj4a2tGQBqLZjYhR3n4b |
-| LASTFM_API_KEY     | Your last.fm API key, used to fetch album art                        | 098f6bcd4621d373cade4e832627b4f6                     |
-| NAVIDROME_SERVER   | Your ND server URL                                                   | https://music.logix.lol                              |
-| NAVIDROME_USERNAME | Your ND username                                                     | logix                                                |
-| NAVIDROME_PASSWORD | Your ND password                                                     | 66_CfZh8                                             |
+| Variable           | Description                | Example value                                        |
+| ------------------ | -------------------------- | ---------------------------------------------------- |
+| DISCORD_CLIENT_ID  | Your Discord app ID        | 805831541070495744                                   |
+| DISCORD_TOKEN      | Your Discord account token | Mzg5NjkzNzA5MzQ4MTQ2NzY4.DM9aRQ.Tj4a2tGQBqLZjYhR3n4b |
+| LASTFM_API_KEY     | Your last.fm API key       | 098f6bcd4621d373cade4e832627b4f6                     |
+| NAVIDROME_SERVER   | Your ND server URL         | https://music.logix.lol                              |
+| NAVIDROME_USERNAME | Your ND username           | logix                                                |
+| NAVIDROME_PASSWORD | Your ND password           | 66_CfZh8                                             |
 
 ## 👀 Other setup
 
