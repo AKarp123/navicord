@@ -9,9 +9,9 @@ Create an .env file with the following variables:
 DISCORD_CLIENT_ID=805831541070495744 # doesn't really matter
 DISCORD_TOKEN=<your_discord_token> # this is used to set your rpc headlessly https://github.com/NotNexuss/Get-Discord-Token
 LASTFM_API_KEY=<your_lastfm_api_key> # we get album art from lastfm https://www.last.fm/api
-NAVIDRONE_SERVER=<your_navidrone_server_url> # this should look like http(s)://music.logix.lol, mind the no trailing slash
-NAVIDRONE_USERNAME=<your_navidrone_username>
-NAVIDRONE_PASSWORD=<your_navidrone_password>
+NAVIDROME_SERVER=<your_navidrome_server_url> # this should look like http(s)://music.logix.lol, mind the no trailing slash
+NAVIDROME_USERNAME=<your_navidrome_username>
+NAVIDROME_PASSWORD=<your_navidrome_password>
 ```
 
 ## Other setup
