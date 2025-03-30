@@ -27,6 +27,9 @@ There are also a few other variables that can be set in the environment file:
 
 ## 🚀 Run the server
 
+> [!IMPORTANT]  
+> Since the Subsonic API does not provide a way to track song changes, we spam the ND server with requests every second. This can makes the logs grow rather quick if your log level is set to `debug` or `trace`
+
 ### Using Docker 🐋
 
 To run the server with docker, you can use the following command:
