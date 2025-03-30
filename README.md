@@ -1,8 +1,10 @@
 # Navicord
 
+[![Docker Image](https://badgen.net/badge/docker/navicord?icon=docker&color=blue)](https://hub.docker.com/r/logixism/navicord/tags)
+
 A _headless_ Discord Rich Presence client for [Navidrome](https://www.navidrome.org/), with automatic album art fetching and timestamps
 
-## Necessary setup
+## ❗ Necessary setup
 Create an .env file with the following variables:
 
 ```env
@@ -14,7 +16,7 @@ NAVIDROME_USERNAME=<your_navidrome_username>
 NAVIDROME_PASSWORD=<your_navidrome_password>
 ```
 
-## Other setup
+## 👀 Other setup
 
 There are also a few other variables that can be set in the environment file:
 
@@ -22,14 +24,16 @@ There are also a few other variables that can be set in the environment file:
 | ------------- | ---------------------- | -------------------------------- |
 | ACTIVITY_NAME | Sets the activity name | ARTIST, ALBUM, TRACK, any string |
 
-## Run the server
-### Using docker
+## 🚀 Run the server
+### Using Docker 🐋
+
 To run the server with docker, you can use the following command:
+
 ```bash
-docker compose up
+docker run logixism/navicord
 ```
 
-### Using python
+### Using Python 🐍
 To run the server with python, you can use the following commands:
 
 First, install the dependencies (needs to be done only the first time)
@@ -42,7 +46,7 @@ Then, run the server
 python main.py
 ```
 
-### Contributing
+## ℹ️ Contributing 
 
 If you find a bug or have a suggestion, please [open an issue](https://github.com/logixism/navicord).
 If you want to contribute, please [fork the repository](https://github.com/logixism/navicord/fork) and create a pull request. Thanks!
