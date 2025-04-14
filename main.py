@@ -194,7 +194,7 @@ rpc = DiscordRPC(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN)
 time_passed = 5
 
 while True:
-    time.sleep(1)
+    time.sleep(config.POLLING_TIME)
 
     CurrentTrack.grab()
 
