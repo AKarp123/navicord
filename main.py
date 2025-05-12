@@ -229,6 +229,7 @@ class CurrentTrack:
 rpc = DiscordRPC(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN)
 
 time_passed = 5
+activity_cleared = False
 print("Starting Navicord...")
 while True:
     def signal_handler(sig, frame):
@@ -248,12 +249,16 @@ while True:
             time_passed = 0
 
             if CurrentTrack.id is None:
-                print("No track found, clearing activity...")
-                rpc.clear_activity()
+                if not activity_cleared:
+                    print("No track found, clearing activity...")
+                    rpc.clear_activity()
+                    activity_cleared = True
                 continue
             if time.time() > CurrentTrack.ends_at:
-                print("Track ended, clearing activity...")
-                rpc.clear_activity()
+                if not activity_cleared:
+                    print("Track ended, clearing activity...")
+                    rpc.clear_activity()
+                    activity_cleared = True 
                 continue
 
             match config.ACTIVITY_NAME:
@@ -287,6 +292,7 @@ while True:
                     "name": activity_name,
                 }
             )
+            activity_cleared = False
 
         time_passed += 1
     except Exception as e:
