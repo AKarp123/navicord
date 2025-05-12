@@ -251,6 +251,10 @@ while True:
                 print("No track found, clearing activity...")
                 rpc.clear_activity()
                 continue
+            if time.time() > CurrentTrack.ends_at:
+                print("Track ended, clearing activity...")
+                rpc.clear_activity()
+                continue
 
             match config.ACTIVITY_NAME:
                 case "ARTIST":
@@ -263,6 +267,8 @@ while True:
                     activity_name = config.ACTIVITY_NAME
 
             large_text_format = f"{CurrentTrack.album_artist} - {CurrentTrack.album}" if CurrentTrack.album_artist != CurrentTrack.artist else CurrentTrack.album
+            
+            
             rpc.send_activity(
                 {
                     "application_id": config.DISCORD_CLIENT_ID,
