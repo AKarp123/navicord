@@ -86,6 +86,7 @@ class CurrentTrack:
     def set(cls, skip_none_check=False, **kwargs):
         image_url = kwargs.get("image_url")
         cls.image_url = image_url
+        
 
         id = kwargs.get("id")
         duration = kwargs.get("duration")
@@ -117,6 +118,10 @@ class CurrentTrack:
         cls.track_number = track_number
         cls.track_total = track_total
         cls.album_artist = album_artist
+        
+        print(f"Now playing: {cls.artist} - {cls.title} ({cls.album})")
+        
+
     @classmethod
     def _grab_subsonic(cls):
         res = requests.get(
@@ -147,6 +152,7 @@ class CurrentTrack:
         if json["status"] == "ok" and len(json["nowPlaying"]) > 0:
             nowPlayingEntry = json["nowPlaying"]["entry"]
             nowPlayingList = cls._filter_nowplaying(nowPlayingEntry)
+            
 
             if len(nowPlayingList) == 0:
                 cls.set(skip_none_check=True)
@@ -180,12 +186,15 @@ class CurrentTrack:
                         title=nowPlaying["title"],
                         album_id=nowPlaying["albumId"],
                         album_artist=album_data["artist"],
-                        track_number=nowPlaying["track"],
+                        track_number=nowPlaying.get("trackNumber", 1),
                         track_total=track_total
                     )
-                    
-                except (KeyError, TypeError):
+                except Exception as e:
+                    print("There was an error parsing album data: ", e)
                     track_total = None
+            else:
+                print("There was an error getting album info: ", albumInfo.text)
+                    
 
     @classmethod
     def _grab_lastfm(cls):
