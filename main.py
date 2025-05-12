@@ -233,7 +233,7 @@ print("Starting Navicord...")
 while True:
     def signal_handler(sig, frame):
         print("Exiting...")
-        rpc.clear_activity()
+        rpc.stop_activity()
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -248,6 +248,7 @@ while True:
             time_passed = 0
 
             if CurrentTrack.id is None:
+                print("No track found, clearing activity...")
                 rpc.clear_activity()
                 continue
 

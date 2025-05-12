@@ -112,7 +112,7 @@ class DiscordRPC:
             "d": {
                 "since": None,
                 "activities": [activity_data],
-                "status": "dnd",
+                "status": "idle",
                 "afk": False,
             },
         }
@@ -121,7 +121,24 @@ class DiscordRPC:
         except Exception:
             self._connect()
 
+
+
     def clear_activity(self):
+        if not self.ws:
+            return
+        payload = {
+            "op": 3,
+            "d": {
+                "since": None,
+                "activities": [None],
+                "status": "invisible",
+                "afk": False,
+            },
+        }
+        self.ws.send(json.dumps(payload))
+        
+    
+    def stop_activity(self):
         if not self.ws:
             return
         payload = {
