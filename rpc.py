@@ -113,7 +113,7 @@ class DiscordRPC:
                 "since": None,
                 "activities": [activity_data],
                 "status": "idle",
-                "afk": False,
+                "afk": True,
             },
         }
         try:
@@ -132,7 +132,7 @@ class DiscordRPC:
                 "since": None,
                 "activities": [None],
                 "status": "invisible",
-                "afk": False,
+                "afk": True,
             },
         }
         self.ws.send(json.dumps(payload))
