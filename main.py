@@ -231,6 +231,14 @@ rpc = DiscordRPC(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN)
 time_passed = 5
 print("Starting Navicord...")
 while True:
+    def signal_handler(sig, frame):
+        print("Exiting...")
+        rpc.clear_activity()
+        sys.exit(0)
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGQUIT, signal_handler)
+    signal.signal(signal.SIGHUP, signal_handler)
     try:
         time.sleep(config.POLLING_TIME)
 
@@ -280,11 +288,3 @@ while True:
         break
 
     
-def signal_handler(sig, frame):
-    print("Exiting...")
-    rpc.clear_activity()
-    sys.exit(0)
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
-signal.signal(signal.SIGQUIT, signal_handler)
-signal.signal(signal.SIGHUP, signal_handler)
