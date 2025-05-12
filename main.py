@@ -186,7 +186,7 @@ class CurrentTrack:
                         title=nowPlaying["title"],
                         album_id=nowPlaying["albumId"],
                         album_artist=album_data["artist"],
-                        track_number=nowPlaying.get("trackNumber", 1),
+                        track_number=nowPlaying.get("track", 1),
                         track_total=track_total
                     )
                 except Exception as e:
