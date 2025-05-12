@@ -147,7 +147,7 @@ class DiscordRPC:
                 "since": None,
                 "activities": [None],
                 "status": "invisible",
-                "afk": False,
+                "afk": True,
             },
         }
         self.ws.send(json.dumps(payload))
