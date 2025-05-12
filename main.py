@@ -239,6 +239,7 @@ rpc = DiscordRPC(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN)
 
 time_passed = 5
 activity_cleared = False
+current_track_id = None
 print("Starting Navicord...")
 while True:
     def signal_handler(sig, frame):
@@ -254,35 +255,36 @@ while True:
 
         CurrentTrack.grab()
 
-        if time_passed >= 5:
-            time_passed = 0
 
-            if CurrentTrack.id is None:
-                if not activity_cleared:
-                    print("No track found, clearing activity...")
-                    rpc.clear_activity()
-                    activity_cleared = True
-                continue
-            if time.time() > CurrentTrack.ends_at:
-                if not activity_cleared:
-                    print("Track ended, clearing activity...")
-                    rpc.clear_activity()
-                    activity_cleared = True 
-                continue
+        if CurrentTrack.id is None:
+            if not activity_cleared:
+                print("No track found, clearing activity...")
+                rpc.clear_activity()
+                activity_cleared = True
+            continue
+        if time.time() > CurrentTrack.ends_at:
+            if not activity_cleared:
+                print("Track ended, clearing activity...")
+                rpc.clear_activity()
+                activity_cleared = True 
+            continue
 
-            match config.ACTIVITY_NAME:
-                case "ARTIST":
-                    activity_name = CurrentTrack.artist
-                case "ALBUM":
-                    activity_name = CurrentTrack.album
-                case "TRACK":
-                    activity_name = CurrentTrack.title
-                case _:
-                    activity_name = config.ACTIVITY_NAME
+        match config.ACTIVITY_NAME:
+            case "ARTIST":
+                activity_name = CurrentTrack.artist
+            case "ALBUM":
+                activity_name = CurrentTrack.album
+            case "TRACK":
+                activity_name = CurrentTrack.title
+            case _:
+                activity_name = config.ACTIVITY_NAME
 
-            large_text_format = f"{CurrentTrack.album_artist} - {CurrentTrack.album}" if CurrentTrack.album_artist != CurrentTrack.artist else CurrentTrack.album
+        large_text_format = f"{CurrentTrack.album_artist} - {CurrentTrack.album}" if CurrentTrack.album_artist != CurrentTrack.artist else CurrentTrack.album
             
             
+        if CurrentTrack.id == current_track_id:
+            continue
+        else:
             rpc.send_activity(
                 {
                     "application_id": config.DISCORD_CLIENT_ID,
@@ -301,6 +303,7 @@ while True:
                     "name": activity_name,
                 }
             )
+            current_track_id = CurrentTrack.id
             activity_cleared = False
 
         time_passed += 1
