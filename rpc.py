@@ -107,7 +107,6 @@ class DiscordRPC:
         activity_data["assets"]["large_image"] = self._process_image(
             activity_data["assets"]["large_image"]
         )
-
         payload = {
             "op": 3,
             "d": {

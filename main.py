@@ -6,6 +6,8 @@ import json
 import os
 
 from rpc import DiscordRPC
+import signal
+import sys
 
 
 class PersistentStore:
@@ -227,7 +229,7 @@ class CurrentTrack:
 rpc = DiscordRPC(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN)
 
 time_passed = 5
-
+print("Starting Navicord...")
 while True:
     try:
         time.sleep(config.POLLING_TIME)
@@ -272,10 +274,17 @@ while True:
             )
 
         time_passed += 1
-    except KeyboardInterrupt:
-        rpc.clear_activity()
-        break
     except Exception as e:
-        print("An error occurred: ", e)
-        rpc.clear_activity()
+        print("There was an error: ", e)
+        time.sleep(5)
         break
+
+    
+def signal_handler(sig, frame):
+    print("Exiting...")
+    rpc.clear_activity()
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGQUIT, signal_handler)
+signal.signal(signal.SIGHUP, signal_handler)
