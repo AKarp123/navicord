@@ -63,11 +63,15 @@ class CurrentTrack:
     title = None
     artist = None
     album = None
+    album_artist = None
+    track_number = None
+    track_total = None
 
     started_at = None
     ends_at = None
 
     image_url = None
+
 
     def _filter_nowplaying(entry):
         return [
@@ -85,11 +89,14 @@ class CurrentTrack:
         duration = kwargs.get("duration")
         artist = kwargs.get("artist")
         album = kwargs.get("album")
+        album_artist = kwargs.get("album_artist")
         title = kwargs.get("title")
         album_id = kwargs.get("album_id")
+        track_total = kwargs.get("track_total")
+        track_number = kwargs.get("track_number")
 
         if (
-            None in [id, duration, artist, album, title, album_id]
+            None in [id, duration, artist, album, title, album_id, track_total, track_number, album_artist]
             and not skip_none_check
         ):
             return
@@ -102,9 +109,12 @@ class CurrentTrack:
         cls.title = title
         cls.artist = artist
         cls.album = album
+        cls.track_total = track_total
         cls.started_at = time.time()
         cls.ends_at = cls.started_at + (duration or 0)
-
+        cls.track_number = track_number
+        cls.track_total = track_total
+        cls.album_artist = album_artist
     @classmethod
     def _grab_subsonic(cls):
         res = requests.get(
@@ -141,15 +151,39 @@ class CurrentTrack:
                 return
 
             nowPlaying = nowPlayingList[0]
-
-            cls.set(
-                id=nowPlaying["id"],
-                duration=nowPlaying["duration"],
-                artist=nowPlaying["artist"],
-                album=nowPlaying["album"],
-                title=nowPlaying["title"],
-                album_id=nowPlaying["albumId"],
+            
+            
+            albumInfo = requests.get(
+                f"{config.NAVIDROME_SERVER}/rest/getAlbum",
+                params={
+                    "u": config.NAVIDROME_USERNAME,
+                    "p": config.NAVIDROME_PASSWORD,
+                    "id": nowPlaying["albumId"],
+                    "f": "json",
+                    "v": "1.13.0",
+                    "c": "navicord",
+                },
             )
+            
+            
+            if albumInfo.status_code == 200:
+                try:
+                    album_data = albumInfo.json()["subsonic-response"]["album"]
+                    track_total = len(album_data["song"])
+                    cls.set(
+                        id=nowPlaying["id"],
+                        duration=nowPlaying["duration"],
+                        artist=nowPlaying["artist"],
+                        album=nowPlaying["album"],
+                        title=nowPlaying["title"],
+                        album_id=nowPlaying["albumId"],
+                        album_artist=album_data["artist"],
+                        track_number=nowPlaying["track"],
+                        track_total=track_total
+                    )
+                    
+                except (KeyError, TypeError):
+                    track_total = None
 
     @classmethod
     def _grab_lastfm(cls):
@@ -162,12 +196,11 @@ class CurrentTrack:
             params={
                 "method": "album.getinfo",
                 "api_key": config.LASTFM_API_KEY,
-                "artist": cls.artist,
+                "artist": cls.album_artist,
                 "album": cls.album,
                 "format": "json",
             },
         )
-
         if res.status_code == 200:
             image_url = res.json()["album"]["image"][3]["#text"]
 
@@ -180,6 +213,8 @@ class CurrentTrack:
             )
 
             PersistentStore.set(cls.album_id, image_url)
+        else:
+            print("There was an error getting lastfm: ", res.text)
 
     @classmethod
     def grab(cls):
@@ -194,42 +229,53 @@ rpc = DiscordRPC(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN)
 time_passed = 5
 
 while True:
-    time.sleep(config.POLLING_TIME)
+    try:
+        time.sleep(config.POLLING_TIME)
 
-    CurrentTrack.grab()
+        CurrentTrack.grab()
 
-    if time_passed >= 5:
-        time_passed = 0
+        if time_passed >= 5:
+            time_passed = 0
 
-        if CurrentTrack.id is None:
-            rpc.clear_activity()
-            continue
+            if CurrentTrack.id is None:
+                rpc.clear_activity()
+                continue
 
-        match config.ACTIVITY_NAME:
-            case "ARTIST":
-                activity_name = CurrentTrack.artist
-            case "ALBUM":
-                activity_name = CurrentTrack.album
-            case "TRACK":
-                activity_name = CurrentTrack.title
-            case _:
-                activity_name = config.ACTIVITY_NAME
+            match config.ACTIVITY_NAME:
+                case "ARTIST":
+                    activity_name = CurrentTrack.artist
+                case "ALBUM":
+                    activity_name = CurrentTrack.album
+                case "TRACK":
+                    activity_name = CurrentTrack.title
+                case _:
+                    activity_name = config.ACTIVITY_NAME
 
-        rpc.send_activity(
-            {
-                "application_id": config.DISCORD_CLIENT_ID,
-                "type": 2,
-                "state": CurrentTrack.album,
-                "details": CurrentTrack.title,
-                "assets": {
-                    "large_image": CurrentTrack.image_url,
-                },
-                "timestamps": {
-                    "start": CurrentTrack.started_at * 1000,
-                    "end": CurrentTrack.ends_at * 1000,
-                },
-                "name": activity_name,
-            }
-        )
+            large_text_format = f"{CurrentTrack.album_artist} - {CurrentTrack.album}" if CurrentTrack.album_artist != CurrentTrack.artist else CurrentTrack.album
+            rpc.send_activity(
+                {
+                    "application_id": config.DISCORD_CLIENT_ID,
+                    "type": 2,
+                    "state": f"{CurrentTrack.artist}",
+                    
+                    "details": CurrentTrack.title,
+                    "assets": {
+                        "large_image": CurrentTrack.image_url,
+                        "large_text": large_text_format + f" ({CurrentTrack.track_number} of {CurrentTrack.track_total})",
+                    },
+                    "timestamps": {
+                        "start": CurrentTrack.started_at * 1000,
+                        "end": CurrentTrack.ends_at * 1000,
+                    },
+                    "name": activity_name,
+                }
+            )
 
-    time_passed += 1
+        time_passed += 1
+    except KeyboardInterrupt:
+        rpc.clear_activity()
+        break
+    except Exception as e:
+        print("An error occurred: ", e)
+        rpc.clear_activity()
+        break
