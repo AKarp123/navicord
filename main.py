@@ -245,6 +245,7 @@ while True:
     def signal_handler(sig, frame):
         print("Exiting...")
         rpc.stop_activity()
+        rpc.shutdown()
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
