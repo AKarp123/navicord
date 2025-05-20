@@ -261,12 +261,14 @@ while True:
                 print("No track found, clearing activity...")
                 rpc.clear_activity()
                 activity_cleared = True
+                current_track_id = None
             continue
         if time.time() > CurrentTrack.ends_at:
             if not activity_cleared:
                 print("Track ended, clearing activity...")
                 rpc.clear_activity()
                 activity_cleared = True 
+                current_track_id = None
             continue
 
         match config.ACTIVITY_NAME:
